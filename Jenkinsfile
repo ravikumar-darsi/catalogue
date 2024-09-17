@@ -33,11 +33,20 @@ pipeline {
                 }
             }
     }
-    stage(''){
-      steps {
-        
-      }
-    }
+    stage('Install dependencies') {
+            steps {
+                sh """
+                    npm install
+                """
+            }
+        }
+        stage('Unit tests') {
+            steps {
+                sh """
+                    echo "unit tests will run here"
+                """
+            }
+        }
   }
   post {
      always {
