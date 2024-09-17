@@ -1,92 +1,96 @@
 pipeline {
-  agent{
-    node{
-      label 'AGENT-1'
+    agent {
+        node {
+            label 'AGENT-1' // Specifies the node with label 'AGENT-1' to run the pipeline on
+        }
     }
-  }
-  environment { 
-        packageVersion = ''
-        nexusURL = '172.31.21.186:8081'
-        //http://34.235.126.111:8081/repository/catalogue/
+    environment { 
+        packageVersion = '' // Placeholder for the package version extracted from the package.json file
+        nexusURL = '172.31.21.186:8081' // URL for Nexus repository
     }
-  options {
-        timeout(time: 1, unit: 'HOURS')
-        disableConcurrentBuilds()
+    options {
+        timeout(time: 1, unit: 'HOURS') // Set timeout of 1 hour for the entire pipeline
+        disableConcurrentBuilds() // Prevents concurrent builds of the same job
     }
-  // parameters {
-  //       // string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
 
-  //       // text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
+    // Uncomment the parameters block if you need to pass parameters
+    // parameters {
+    //     string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+    //     text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
+    //     booleanParam(name: 'Deploy', defaultValue: false, description: 'Toggle this value')
+    //     choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
+    //     password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
+    // }
 
-  //       //booleanParam(name: 'Deploy', defaultValue: false, description: 'Toggle this value')
-
-  //       // choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
-
-  //       // password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
-  //   }
-  stages{
-    stage('Get the Version') {
-        steps {
-                script { // def means creation of variable
+    stages {
+        stage('Get the Version') {
+            steps {
+                script {
+                    // Read the version from the package.json file
                     def packageJson = readJSON file: 'package.json'
-                    packageVersion = packageJson.version
-                    echo "application version: $packageVersion"
+                    packageVersion = packageJson.version // Set packageVersion to the version in package.json
+                    echo "application version: $packageVersion" // Display the version in the console output
                 }
             }
-    }
-    stage('Install dependencies') {
+        }
+        stage('Install dependencies') {
             steps {
+              // Install project dependencies using npm
                 sh """
-                    npm install
+                    npm install 
                 """
             }
         }
         stage('Unit tests') {
             steps {
+              // Placeholder for running unit tests
                 sh """
-                    echo "unit tests will run here"
+                    echo "unit tests will run here" 
                 """
             }
         }
-         stage('Build') {
+        stage('Build') {
             steps {
+              // List the current files and directories
+              // Create a zip file, excluding .git and any .zip files
                 sh """
-                    ls -la
-                    zip -q -r catalogue.zip ./* -x ".git" -x "*.zip"
+                    ls -la 
+                    zip -q -r catalogue.zip ./* -x ".git" -x "*.zip" 
                     ls -ltr
                 """
             }
         }
         stage('Publish Artifact') {
             steps {
-                 nexusArtifactUploader(
-                    nexusVersion: 'nexus3',
-                    protocol: 'http',
-                    nexusUrl: "${nexusURL}",
-                    groupId: 'com.roboshop',
-                    version: "${packageVersion}",
-                    repository: 'catalogue',
-                    credentialsId: 'nexus-auth',
+                nexusArtifactUploader(
+                    nexusVersion: 'nexus3', // Specify Nexus version (Nexus 3 in this case)
+                    protocol: 'http', // Use HTTP protocol to connect to Nexus
+                    nexusUrl: "${nexusURL}", // Nexus URL defined in environment variables
+                    groupId: 'com.roboshop', // Define the groupId for the artifact
+                    version: "${packageVersion}", // Use the package version fetched from the package.json
+                    repository: 'catalogue', // Repository name in Nexus
+                    credentialsId: 'nexus-auth', // Jenkins credentials ID for Nexus authentication
                     artifacts: [
-                        [artifactId: 'catalogue',
-                        classifier: '',
-                        file: 'catalogue.zip',
-                        type: 'zip']
+                        [artifactId: 'catalogue', // Define artifactId for the artifact
+                        classifier: '', // No classifier needed for this artifact
+                        file: 'catalogue.zip', // File to be uploaded
+                        type: 'zip'] // Define the type of the file (zip)
                     ]
                 )
             }
         }
-  }
-  post {
-     always {
-          echo 'I will always say Hello again!..'
-          deleteDir()
+    }
+
+    post {
+        always {
+            echo 'I will always say Hello again!..' // This will always run, regardless of the build result
+            deleteDir() // Clean up workspace after the build
         }
-     failure {
-          echo 'This block of scripts runs only when pipeline is failed, used generally to send some alerts'
+        failure {
+            echo 'This block of scripts runs only when the pipeline has failed, used generally to send some alerts' // Execute only on failure
         }
-     success {
-          echo 'I will say Hello when pipeline is executed successfully'
+        success {
+            echo 'I will say Hello when the pipeline is executed successfully' // Execute only on successful execution
         }
-  }
+    }
 }
