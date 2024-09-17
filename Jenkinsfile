@@ -86,7 +86,7 @@ pipeline {
             //         params.Deploy == 'true'
             //     }
             // }
-            step {
+            steps {
                 script {
                     def params = [
                             string(name: 'version', value: "$packageVersion"),
