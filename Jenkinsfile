@@ -50,6 +50,13 @@ pipeline {
                 """
             }
         }
+        stage('Sonar Scan'){
+            steps{
+                sh """
+                    sonar-scanner
+                """
+            }
+        }
         stage('Build') {
             steps {
               // List the current files and directories
