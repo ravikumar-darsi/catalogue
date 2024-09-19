@@ -1,0 +1,47 @@
+Types of scanning
+
+Static source code analysis
+   we use SonarQube
+Static Application Security Testing (SAST) 
+   Fortify
+Dynamic Application Security Testing (DAST)
+   we inspect
+Open Source Library Scanning 
+  nexus iq 
+docker image scanning
+ twistlock, ECR scanning
+
+everytime we won't go for deployment as is long process
+
+First we have to set the pre - requirment like 
+
+dependencies installation 
+build
+all type of scanning
+unit Testing
+nexus upload
+
+what is quality gate ?
+----------------------
+0 bugs
+0 code smells
+security rating should be A
+code coverage should be more than 80
+
+
+git ---> will have multiple branches.... multi branch pipeline
+
+
+jenkins shared library ---> treat your pipeline as library, use it wherever you want it
+
+how can we achieve this ?
+-------------------------
+1. create a feature branch in catalogue
+2. configure multi branch pipeline
+3. configure jenkins shared library 
+
+1. created a repo and added pipelines there in jenkins Manage Jenkins ---> System --> global pipeline libraries
+2.  location and name , and git repo link
+
+nodejsvm/javavm/pythonvm/govm is a centralised pipeline, we need to send parameters
+
